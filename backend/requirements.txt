@@ -1,0 +1,25 @@
+# Django Core
+Django>=5.0,<6.0
+djangorestframework>=3.14,<4.0
+django-cors-headers>=4.3,<5.0
+django-filter>=23.5,<24.0
+django-extensions>=3.2,<4.0
+django-cleanup>=8.0,<9.0
+
+# Database (PostgreSQL - optionnel)
+psycopg2-binary>=2.9,<3.0
+
+# Media & Images
+Pillow>=10.0,<11.0
+
+# Caching & Performance
+django-redis>=5.4,<6.0
+redis>=5.0,<6.0
+
+# API & Validation
+coreapi>=2.3,<3.0
+drf-spectacular>=0.27,<0.28
+
+# Production
+gunicorn>=21.0,<22.0
+whitenoise>=6.6,<7.0

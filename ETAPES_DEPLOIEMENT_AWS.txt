@@ -1,0 +1,147 @@
+================================================================================
+  AIUNIVERS - ETAPES DE DEPLOIEMENT SUR AWS
+================================================================================
+
+Document destine a la mise en production du site AIUnivers sur une instance
+Amazon EC2. Suivre les etapes dans l'ordre.
+
+--------------------------------------------------------------------------------
+1. PREPARER L'INSTANCE AWS
+--------------------------------------------------------------------------------
+
+- Creer une instance EC2 (Ubuntu 22.04 LTS recommande).
+- Taille minimale : t3.small (2 vCPU, 2 Go RAM), 20 Go de stockage.
+- Télécharger la cle SSH (.pem) et la conserver en securite.
+- Dans les Security Groups, ouvrir les ports : 22 (SSH), 80 (HTTP), 443 (HTTPS).
+
+--------------------------------------------------------------------------------
+2. SE CONNECTER A L'INSTANCE
+--------------------------------------------------------------------------------
+
+Depuis un terminal :
+
+  ssh -i chemin/vers/cle.pem ubuntu@ADRESSE_IP_PUBLIQUE
+
+Remplacer chemin/vers/cle.pem et ADRESSE_IP_PUBLIQUE par vos valeurs.
+
+--------------------------------------------------------------------------------
+3. INSTALLER DOCKER (UNE SEULE FOIS)
+--------------------------------------------------------------------------------
+
+Executer les commandes suivantes :
+
+  sudo apt update && sudo apt upgrade -y
+  curl -fsSL https://get.docker.com -o get-docker.sh
+  sudo sh get-docker.sh
+  sudo usermod -aG docker ubuntu
+  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+
+Se deconnecter puis se reconnecter en SSH pour que les droits Docker soient actifs.
+
+--------------------------------------------------------------------------------
+4. RECUPERER LE PROJET
+--------------------------------------------------------------------------------
+
+  git clone URL_DU_DEPOT_GIT aiunivers_website
+  cd aiunivers_website
+
+Remplacer URL_DU_DEPOT_GIT par l'URL du depot (GitHub, GitLab, etc.).
+
+--------------------------------------------------------------------------------
+5. CONFIGURER LES VARIABLES D'ENVIRONNEMENT
+--------------------------------------------------------------------------------
+
+  cp env.prod.template .env.prod
+  nano .env.prod
+
+Modifier obligatoirement les lignes suivantes :
+
+  POSTGRES_PASSWORD=UnMotDePasseSecurise123
+  DJANGO_SECRET_KEY=UneCleLongueEtAleatoire
+  ALLOWED_HOSTS=votre-domaine.com,ADRESSE_IP_PUBLIQUE,localhost
+  NEXT_PUBLIC_API_URL=http://ADRESSE_IP_PUBLIQUE
+
+Pour generer une cle Django secrete (sur une machine avec Python) :
+
+  python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+
+Copier le resultat dans DJANGO_SECRET_KEY.
+
+Sauvegarder le fichier (Ctrl+O, Entree, Ctrl+X dans nano).
+
+--------------------------------------------------------------------------------
+6. LANCER LE DEPLOIEMENT
+--------------------------------------------------------------------------------
+
+  chmod +x deploy.sh
+  ./deploy.sh start
+
+Attendre 5 a 10 minutes que tous les services demarrent (build des images, migrations, creation des donnees).
+
+--------------------------------------------------------------------------------
+7. VERIFIER QUE TOUT FONCTIONNE
+--------------------------------------------------------------------------------
+
+  ./deploy.sh health
+
+Le site doit etre accessible a l'adresse :
+
+  http://ADRESSE_IP_PUBLIQUE:3000
+
+L'interface d'administration Django :
+
+  http://ADRESSE_IP_PUBLIQUE:8000/admin
+
+Identifiants de connexion admin :
+  Email    : contact@aiunivers.ai
+  Mot de passe : Aiunivers2026//@
+
+--------------------------------------------------------------------------------
+8. COMMANDES UTILES (APRES DEPLOIEMENT)
+--------------------------------------------------------------------------------
+
+Voir les logs en direct :
+  ./deploy.sh logs
+
+Arreter les services :
+  ./deploy.sh stop
+
+Redemarrer les services :
+  ./deploy.sh restart
+
+Effectuer un backup manuel de la base de donnees :
+  ./deploy.sh backup
+
+Les backups automatiques de la base sont effectues chaque nuit a 2h00.
+Ils sont stockes dans le dossier backups/ (conservation 30 jours).
+
+--------------------------------------------------------------------------------
+9. EN CAS DE PROBLEME
+--------------------------------------------------------------------------------
+
+Consulter les logs pour identifier l'erreur :
+  ./deploy.sh logs
+
+Verifier l'etat des services :
+  ./deploy.sh health
+
+Redemarrer proprement :
+  ./deploy.sh stop
+  ./deploy.sh start
+
+--------------------------------------------------------------------------------
+RESUME EN 4 ETAPES
+--------------------------------------------------------------------------------
+
+1. Creer l'instance EC2, ouvrir les ports 22, 80, 443.
+2. Se connecter en SSH, installer Docker (etapes 2 et 3).
+3. Cloner le projet, copier env.prod.template en .env.prod, editer .env.prod.
+4. Executer : chmod +x deploy.sh && ./deploy.sh start
+
+Acces site : http://ADRESSE_IP:3000
+Acces admin : http://ADRESSE_IP:8000/admin (contact@aiunivers.ai / Aiunivers2026//@)
+
+================================================================================
+Fin du document
+================================================================================

@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+/* Variables CSS pour les thèmes */
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --gradient-from: rgba(16, 185, 129, 0.05);
+  --gradient-mid: rgba(34, 197, 94, 0.05);
+  --gradient-to: rgba(5, 150, 105, 0.025);
+  --input: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(255, 255, 255, 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-input: var(--input);
+  --color-muted-foreground: var(--muted-foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Reset minimal pour éviter les conflits avec les composants */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  background: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  min-height: 100vh;
+}
+
+/* Support RTL pour l'arabe */
+[dir='rtl'] {
+  direction: rtl;
+}
+
+[dir='ltr'] {
+  direction: ltr;
+}
+
+/* Gradient d'arrière-plan */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 50%, var(--gradient-from) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--gradient-mid) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, var(--gradient-to) 0%, transparent 50%);
+  filter: blur(40px);
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s ease;
+}
+
+/* Mode Dark */
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --gradient-from: rgba(16, 185, 129, 0.05);
+  --gradient-mid: rgba(34, 197, 94, 0.05);
+  --gradient-to: rgba(5, 150, 105, 0.025);
+  --input: rgba(255, 255, 255, 0.1);
+  --muted-foreground: rgba(255, 255, 255, 0.5);
+}
+
+/* Mode Light */
+.light {
+  --background: #ffffff;
+  --foreground: #000000;
+  --gradient-from: rgba(16, 185, 129, 0.015);
+  --gradient-mid: rgba(34, 197, 94, 0.015);
+  --gradient-to: rgba(5, 150, 105, 0.01);
+  --input: rgba(0, 0, 0, 0.1);
+  --muted-foreground: rgba(0, 0, 0, 0.5);
+}
+
+/* Animation pour le shimmer effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Bouton "En savoir plus" - animation 100% CSS, position unifiée en bas de l'image */
+.solution-more-btn {
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.group:hover .solution-more-btn {
+  border-color: rgb(52 211 153);
+  background-color: rgba(16, 185, 129, 0.1);
+  color: rgb(52 211 153);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+.group:hover .solution-more-btn-light {
+  box-shadow: 0 0 20px rgba(5, 150, 105, 0.15);
+}
+.group:hover .solution-more-btn-dark {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+}
+
+.solution-more-arrow {
+  transition: transform 0.3s ease;
+}
+.group:hover .solution-more-arrow {
+  transform: translateX(2px);
+}
+@media (min-width: 640px) {
+  .group:hover .solution-more-arrow-reverse {
+    transform: rotate(180deg) translateX(-2px);
+  }
+}
+@media (max-width: 639px) {
+  .group:hover .solution-more-arrow-reverse {
+    transform: translateX(2px);
+  }
+}
